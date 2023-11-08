@@ -1,0 +1,14 @@
+Package: SpatialExperimentReader
+Title: Read in Xenium, CosMx, or Merscope data as SpatialExperiment object.
+Version: 0.0.0.9000
+Authors@R: 
+    person("Estella Yixing", "Dong", "estelladong729@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Read in Xenium, CosMx, or Merscope data as SpatialExperiment object.
+License: MIT
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports: 
+  DropletUtils
+  SpatialExperiment
+RoxygenNote: 7.2.3
