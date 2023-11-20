@@ -1,12 +1,12 @@
-# SpatialExperimentReader
-Read in Xenium, CosMx, and Vizgen data as SpatialExperiment object.
+# SpatialExperimentIO
+Read in Xenium (10x Genomics), CosMx (Nanostring), or MERSCOPE (Vizgen) data as `SpatialExperiment` or `SingleCellExperiment`class object, by specifying `read____SXE(return_type = "SPE")` or `"SCE"`.
 
 ## Installation
 
-You can install the current version of *SeuratQCUtils* from
-[GitHub](https://github.com/estellad/SpatialExperimentReader) with:
+You can install the current version of *SpatialExperimentIO* from
+[GitHub](https://github.com/estellad/SpatialExperimentIO) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("estellad/SpatialExperimentReader")
+devtools::install_github("estellad/SpatialExperimentIO")
 ```
