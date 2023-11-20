@@ -1,4 +1,4 @@
-#' @rdname readXeniumSPE
+#' @rdname readXeniumSXE
 #' 
 #' @title Load data from a 10x Geonomics Xenium experiment
 #' 

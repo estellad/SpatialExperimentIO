@@ -1,4 +1,4 @@
-#' @rdname readMerscopeSPE
+#' @rdname readMerscopeSXE
 #' 
 #' @title Load data from a Vizgen MERSCOPE experiment
 #' 
