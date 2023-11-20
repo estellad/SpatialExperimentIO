@@ -54,7 +54,7 @@ CosMx_unzipped/optional_default_folder/ \cr
 
 cospath <- system.file(
   file.path("extdata", "NanostringCosMx"),
-  package = "SpatialExperiment")
+  package = "SpatialExperimentIO")
   
 list.files(cospath)
 

@@ -51,7 +51,7 @@ CosMx_unzipped/optional_default_folder/ \cr
 TODO: not this ~ ---------------------------------
 starpath <- system.file(
   file.path("extdata", "STARmap_PLUS"),
-  package = "SpatialExperiment")
+  package = "SpatialExperimentIO")
 --------------------------------------------------
   
 TODO: But something like this! -------------------

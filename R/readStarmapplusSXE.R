@@ -39,7 +39,7 @@
 #' TODO: not this ~ ---------------------------------
 #' starpath <- system.file(
 #'   file.path("extdata", "STARmap_PLUS"),
-#'   package = "SpatialExperiment")
+#'   package = "SpatialExperimentIO")
 #' --------------------------------------------------
 #'   
 #' TODO: But something like this! -------------------
@@ -112,6 +112,8 @@ readStarmapplusSXE <- function(dirname = dirname,
       colData = stmpp_coord
     )
   }
+  
+  if(class(counts(sxe)) != "dgCMatrix"){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

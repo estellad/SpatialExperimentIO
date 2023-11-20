@@ -55,7 +55,7 @@ HumanOvarianCancerPatient2Slice2?pageState=(\%22StorageObjectListTable\%22:
 
 merpath <- system.file(
   file.path("extdata", "VizgenMERSCOPE"),
-  package = "SpatialExperiment")
+  package = "SpatialExperimentIO")
   
 list.files(merpath)
 
