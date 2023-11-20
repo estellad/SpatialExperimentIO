@@ -59,7 +59,7 @@ Xenium_unzipped \cr
 
 xepath <- system.file(
   file.path("extdata", "10xXenium"),
-  package = "SpatialExperiment")
+  package = "SpatialExperimentIO")
   
 list.files(xepath)
 
