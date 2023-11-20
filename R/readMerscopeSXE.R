@@ -7,6 +7,8 @@
 #' directory for Vizgen MERSCOPE spatial gene expression data.
 #'
 #' @param dirname a directory path to MERSCOPE download that contains files of interest.
+#' @param return_type option of \code{"SPE"} or \code{"SCE"}, stands for 
+#' \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}
 #' @param countmatfpattern a filename pattern for the count matrix. Default value is 
 #' \code{"cell_by_gene.csv"}, and there is no need to change.
 #' @param metadatafpattern a filename pattern for the metadata .csv file that 
@@ -22,7 +24,7 @@
 #' · | — cell_by_gene.csv \cr
 #' · | — cell_metadata.csv \cr
 #'
-#' @return  a \code{\link{SpatialExperiment}} object 
+#' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
 #' 
 #' @author Estella Yixing Dong
@@ -44,17 +46,23 @@
 #'   
 #' list.files(merpath)
 #' 
-#' mer_spe <- readMerscopeSPE(dirname = merpath, 
-#'                            countmatfpattern = "cell_by_gene.csv", 
-#'                            metadatafpattern = "cell_metadata.csv", 
-#'                            coord_names = c("center_x", "center_y"))
+#' # One of the following depending on your output (`SPE` or `SCE`) requirement.
+#' mer_spe <- readMerscopeSXE(dirname = merpath)
+#' mer_sce <- readMerscopeSXE(dirname = merpath, return_type = "SCE")
+#' 
 #' }
 #' 
 #' @importFrom SpatialExperiment SpatialExperiment
-readMerscopeSPE <- function(dirname = dirname, 
+#' @importFrom SingleCellExperiment SingleCellExperiment
+readMerscopeSXE <- function(dirname = dirname, 
+                            return_type = "SPE",
                             countmatfpattern = "cell_by_gene.csv", 
                             metadatafpattern = "cell_metadata.csv", 
                             coord_names = c("center_x", "center_y")){
+  
+  if(!return_type %in% c("SPE", "SCE")){
+    stop("'return_type' must be one of c('SPE', 'SCE')")
+  }
   
   countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
   metadata_file <- file.path(dirname, list.files(dirname, metadatafpattern))
@@ -77,14 +85,21 @@ readMerscopeSPE <- function(dirname = dirname,
   rownames(metadata) <- metadata$cell + 1
   colData <- subset(metadata, select = -cell)
   
+  if(return_type == "SPE"){
+    # construct 'SpatialExperiment'
+    sxe <- SpatialExperiment::SpatialExperiment(
+      assays = list(counts = counts),
+      # rowData = rowData,
+      colData = colData,
+      spatialCoordsNames = coord_names)
+    }else if(return_type == "SCE"){
+      # construct 'SingleCellExperiment'
+      sxe <- SingleCellExperiment::SingleCellExperiment(
+        assays = list(counts = counts),
+        colData = colData
+      )
+    }
   
-  spe <- SpatialExperiment::SpatialExperiment(
-    assays = list(counts = counts),
-    # rowData = rowData,
-    colData = colData,
-    spatialCoordsNames = coord_names
-  )
-  
-  return(spe)
+  return(sxe)
   
 }

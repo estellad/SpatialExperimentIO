@@ -7,6 +7,8 @@
 #' directory for Nanostring CosMx spatial gene expression data.
 #'
 #' @param dirname a directory path to CosMx download that contains files of interest.
+#' @param return_type option of \code{"SPE"} or \code{"SCE"}, stands for 
+#' \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}
 #' @param countmatfpattern a filename pattern for the count matrix. Default value is 
 #' \code{"exprMat_file.csv"}, and there is no need to change.
 #' @param metadatafpattern a filename pattern for the metadata .csv file that 
@@ -24,7 +26,7 @@
 #' · | — *_metadata_file.csv \cr
 #' 
 #'
-#' @return  a \code{\link{SpatialExperiment}} object 
+#' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
 #' 
 #' @author Estella Yixing Dong
@@ -44,19 +46,24 @@
 #'   
 #' list.files(cospath)
 #' 
-#' cos_spe <- readCosmxSPE(dirname = cospath, 
-#'                         countmatfpattern = "exprMat_file.csv", 
-#'                         metadatafpattern = "metadata_file.csv", 
-#'                         coord_names = c("CenterX_global_px",
-#'                                         "CenterY_global_px"))
+#' # One of the following depending on your output (`SPE` or `SCE`) requirement.
+#' cos_spe <- readCosmxSXE(dirname = cospath)
+#' cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
+#' 
 #' }
 #' 
 #' @importFrom SpatialExperiment SpatialExperiment
-readCosmxSPE <- function(dirname = dirname, 
+#' @importFrom SingleCellExperiment SingleCellExperiment
+readCosmxSXE <- function(dirname = dirname, 
+                         return_type = "SPE",
                          countmatfpattern = "exprMat_file.csv", 
                          metadatafpattern = "metadata_file.csv", 
                          coord_names = c("CenterX_global_px",
                                          "CenterY_global_px")){
+  
+  if(!return_type %in% c("SPE", "SCE")){
+    stop("'return_type' must be one of c('SPE', 'SCE')")
+  }
   
   countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
   metadata_file <- file.path(dirname, list.files(dirname, metadatafpattern))
@@ -78,13 +85,19 @@ readCosmxSPE <- function(dirname = dirname,
   
   colnames(counts) <- rownames(colData) <- 1:ncol(counts)
   
-  
-  spe <- SpatialExperiment::SpatialExperiment(
+  if(return_type == "SPE"){
+  sxe <- SpatialExperiment::SpatialExperiment(
     assays = list(counts = counts),
     # rowData = rowData,
     colData = colData,
-    spatialCoordsNames = coord_names
-  )
+    spatialCoordsNames = coord_names)
+  }else if(return_type == "SCE"){
+    # construct 'SingleCellExperiment'
+    sxe <- SingleCellExperiment::SingleCellExperiment(
+      assays = list(counts = counts),
+      colData = colData
+    )
+  }
   
-  return(spe)
+  return(sxe)
 }

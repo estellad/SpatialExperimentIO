@@ -8,6 +8,8 @@
 #'
 #' @param dirname a directory path to Xenium Output Bundle download that contains 
 #' files of interest.
+#' @param return_type option of \code{"SPE"} or \code{"SCE"}, stands for 
+#' \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}
 #' @param countfname a folder directory or the h5 file for the count matrix. 
 #' Default value is \code{"cell_feature_matrix.h5"}, alternative value is 
 #' \code{"cell_feature_matrix"} that takes a bit longer. The count matrix is 
@@ -32,7 +34,7 @@
 #' · · | - matrix.mtx.gz \cr
 #' · | — cells.csv.gz \cr
 #'
-#' @return a \code{\link{SpatialExperiment}} object 
+#' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
 #'
 #' @author Estella Yixing Dong
@@ -49,27 +51,30 @@
 #'   
 #' list.files(xepath)
 #' 
-#' # read the count matrix .h5 file - automatically DropletUtils::read10xCounts(type = "HDF5")
-#' xe_spe <- readXeniumSPE(dirname = xepath, 
-#'                         countfname = "cell_feature_matrix.h5", 
-#'                         coordfpattern = "cells.csv.gz", 
-#'                         coord_names = c("x_centroid", "y_centroid"))
+#' # One of the following depending on your input (.h5 or folder) and output 
+#' # (`SPE` or `SCE`) requirement.
+#' xe_spe <- readXeniumSXE(dirname = xepath)
+#' xe_spe <- readXeniumSXE(dirname = xepath, countfname = "cell_feature_matrix")
+#' xe_sce <- readXeniumSXE(dirname = xepath, return_type = "SCE")
 #' 
-#' # or read the count matrix folder - automatically DropletUtils::read10xCounts(type = "sparse")                        
-#' xe_spe <- readXeniumSPE(dirname = xepath, 
-#'                         countfname = "cell_feature_matrix", 
-#'                         coordfpattern = "cells.csv.gz", 
-#'                         coord_names = c("x_centroid", "y_centroid"))
-#'                         
-#' # Subset to no control genes                         
+#' # Subset to no control genes, and the same needed for `xe_sce` if read in as 
+#' # `SCE`.
 #' xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
+#'
 #' }
 #' @importFrom DropletUtils read10xCounts
 #' @importFrom SpatialExperiment SpatialExperiment
-readXeniumSPE <- function(dirname, 
+#' @importFrom SingleCellExperiment SingleCellExperiment
+readXeniumSXE <- function(dirname, 
+                          return_type = "SPE",
                           countfname = "cell_feature_matrix.h5",
                           coordfpattern = "cells.csv.gz", 
                           coord_names = c("x_centroid", "y_centroid")){
+  
+  if(!return_type %in% c("SPE", "SCE")){
+    stop("'return_type' must be one of c('SPE', 'SCE')")
+  }
+  
   countfpath <- file.path(dirname, countfname)
   coord_file <- file.path(dirname, list.files(dirname, coordfpattern))
   
@@ -79,13 +84,19 @@ readXeniumSPE <- function(dirname,
   # Spatial and colData
   colData <- read.csv(gzfile(coord_file), header = TRUE)
   
-  # construct 'SpatialExperiment'
-  spe <- SpatialExperiment::SpatialExperiment(
-    assays = assays(sce),
-    rowData = rowData(sce),
-    colData = colData,
-    spatialCoordsNames = coord_names
-  )
-  
-  return(spe)
+  if(return_type == "SPE"){
+    # construct 'SpatialExperiment'
+    sxe <- SpatialExperiment::SpatialExperiment(
+      assays = assays(sce),
+      rowData = rowData(sce),
+      colData = colData,
+      spatialCoordsNames = coord_names
+    )
+  }else if(return_type == "SCE"){
+    # construct 'SingleCellExperiment'
+    colData(sce) <- as(colData, "DFrame")
+    sxe <- sce
+  }
+
+  return(sxe)
 }

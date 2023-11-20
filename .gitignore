@@ -1,6 +1,7 @@
 # History files
 .Rhistory
 .Rapp.history
+.Rbuildignore
 
 # Session Data files
 .RData
