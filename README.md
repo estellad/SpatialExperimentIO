@@ -1,5 +1,5 @@
 # SpatialExperimentIO
-Read in Xenium (10x Genomics), CosMx (Nanostring), or MERSCOPE (Vizgen) data as `SpatialExperiment` or `SingleCellExperiment`class object, by specifying `read____SXE(return_type = "SPE")` or `"SCE"`.
+Read in Xenium (10x Genomics), CosMx (Nanostring), MERSCOPE (Vizgen), STARmapPLUS (Wang et al., 2023, Broad Institute) data as `SpatialExperiment` or `SingleCellExperiment`class object, by specifying `read____SXE(return_type = "SPE")` or `"SCE"`.
 
 ## Installation
 

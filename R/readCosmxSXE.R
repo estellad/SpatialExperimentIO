@@ -1,4 +1,4 @@
-#' @rdname readCosmxSPE
+#' @rdname readCosmxSXE
 #' 
 #' @title Load data from a Nanostring CosMx experiment
 #' 
