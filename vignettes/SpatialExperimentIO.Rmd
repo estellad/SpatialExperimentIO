@@ -1,7 +1,7 @@
 ---
 title: "SpatialExperimentIO - Data Reader Package Overview"
 author:   
-  - name: Estella Yixing Dong
+  - name: Yixing E. Dong
     affiliation: "University of Lausanne, Lausanne, Switzerland"
 output: 
   BiocStyle::html_document:
@@ -311,6 +311,10 @@ Downloaded from, and for more data: https://zenodo.org/records/8327576
 ## Read STARmap PLUS as a `SpatialExperiment` object
 
 ## Read STARmap PLUS as a `SingleCellExperiment` object
+
+
+## CODEX
+Public dataset: https://help.codex.bio/codex/mav/public-datasets
 
 
 
