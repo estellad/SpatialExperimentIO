@@ -1,4 +1,4 @@
-#' @rdname readXeniumSPE
+#' @rdname readXeniumSXE
 #' 
 #' @title Load data from a 10x Geonomics Xenium experiment
 #' 
@@ -47,7 +47,7 @@
 #' 
 #' xepath <- system.file(
 #'   file.path("extdata", "10xXenium"),
-#'   package = "SpatialExperiment")
+#'   package = "SpatialExperimentIO")
 #'   
 #' list.files(xepath)
 #' 
@@ -94,9 +94,12 @@ readXeniumSXE <- function(dirname,
     )
   }else if(return_type == "SCE"){
     # construct 'SingleCellExperiment'
+    rownames(colData) <- colnames(sce)
     colData(sce) <- as(colData, "DFrame")
     sxe <- sce
   }
-
+  
+  if(class(counts(sxe)) != "dgCMatrix"){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
+  
   return(sxe)
 }

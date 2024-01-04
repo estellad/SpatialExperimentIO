@@ -1,4 +1,4 @@
-#' @rdname readMerscopeSPE
+#' @rdname readMerscopeSXE
 #' 
 #' @title Load data from a Vizgen MERSCOPE experiment
 #' 
@@ -42,7 +42,7 @@
 #' 
 #' merpath <- system.file(
 #'   file.path("extdata", "VizgenMERSCOPE"),
-#'   package = "SpatialExperiment")
+#'   package = "SpatialExperimentIO")
 #'   
 #' list.files(merpath)
 #' 
@@ -99,6 +99,8 @@ readMerscopeSXE <- function(dirname = dirname,
         colData = colData
       )
     }
+  
+  if(class(counts(sxe)) != "dgCMatrix"){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
   

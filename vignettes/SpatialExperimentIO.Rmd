@@ -1,7 +1,7 @@
 ---
 title: "SpatialExperimentIO - Data Reader Package Overview"
 author:   
-  - name: Estella Yixing Dong
+  - name: Yixing E. Dong
     affiliation: "University of Lausanne, Lausanne, Switzerland"
 output: 
   BiocStyle::html_document:
@@ -299,6 +299,24 @@ dim(mer_spe)[2]
 ```
 
 In reality, a MERSCOPE data set can have a dimension of 550 genes and around 250,000 cells for the [human ovarian cancer data](https://console.cloud.google.com/storage/browser/vz-ffpe-showcase/HumanOvarianCancerPatient2Slice1?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))).
+
+# STARmap PLUS
+In situ sequencing method, technology first introduced: https://pubmed.ncbi.nlm.nih.gov/36732642/,
+
+Data used are mentioned in paper: https://www.nature.com/articles/s41586-023-06569-5
+
+Data description is from: https://www.spatial-atlas.net/Brain/
+Downloaded from, and for more data: https://zenodo.org/records/8327576
+
+## Read STARmap PLUS as a `SpatialExperiment` object
+
+## Read STARmap PLUS as a `SingleCellExperiment` object
+
+
+## CODEX
+Public dataset: https://help.codex.bio/codex/mav/public-datasets
+
+
 
 # Reference {.smaller}
 
