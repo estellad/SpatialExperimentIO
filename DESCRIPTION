@@ -2,7 +2,7 @@ Package: SpatialExperimentIO
 Title: Read in Xenium, CosMx, or Merscope data as SpatialExperiment object.
 Version: 0.1.0
 Authors@R: c(
-    person("Estella Y.", "Dong", 
+    person("Yixing E.", "Dong", 
         email = "estelladong729@gmail.com", 
         role = c("aut", "cre"), 
         comment = c(ORCID = "0000-0003-3839-7958")))

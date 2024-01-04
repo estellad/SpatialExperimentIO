@@ -1,4 +1,4 @@
-#' @rdname readCosmxSPE
+#' @rdname readCosmxSXE
 #' 
 #' @title Load data from a Nanostring CosMx experiment
 #' 
@@ -42,7 +42,7 @@
 #' 
 #' cospath <- system.file(
 #'   file.path("extdata", "NanostringCosMx"),
-#'   package = "SpatialExperiment")
+#'   package = "SpatialExperimentIO")
 #'   
 #' list.files(cospath)
 #' 
@@ -98,6 +98,8 @@ readCosmxSXE <- function(dirname = dirname,
       colData = colData
     )
   }
+  
+  if(class(counts(sxe)) != "dgCMatrix"){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

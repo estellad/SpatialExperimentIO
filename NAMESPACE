@@ -2,7 +2,8 @@
 
 export(readCosmxSXE)
 export(readMerscopeSXE)
+export(readStarmapplusSXE)
 export(readXeniumSXE)
 importFrom(DropletUtils,read10xCounts)
-importFrom(SpatialExperiment,SpatialExperiment)
 importFrom(SingleCellExperiment,SingleCellExperiment)
+importFrom(SpatialExperiment,SpatialExperiment)
