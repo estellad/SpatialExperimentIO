@@ -90,9 +90,9 @@ readCosmxSXE <- function(dirname = dirname,
   metadata <- read.csv(metadata_file)
   
   # Count matrix   
-  counts <- merge(countmat, metadata[, c("fov", "cell_ID")])
-  counts <- subset(counts, select = -c(fov, cell_ID))
-  counts <- t(counts)
+  countmat <- merge(countmat, metadata[, c("fov", "cell_ID")])
+  countmat <- subset(countmat, select = -c(fov, cell_ID))
+  countmat <- t(countmat)
   
   # rowData (does not exist)
   
@@ -103,23 +103,23 @@ readCosmxSXE <- function(dirname = dirname,
     stop("`coord_names` not in columns of `metadatafpattern`. For CosMx, expect c('CenterX_global_px', 'CenterY_global_px') in the columns of the metadata 'metadata_file.csv'. " )
   }
   
-  colnames(counts) <- rownames(metadata) <- 1:ncol(counts)
+  colnames(countmat) <- rownames(metadata) <- 1:ncol(countmat)
   
   if(return_type == "SPE"){
   sxe <- SpatialExperiment::SpatialExperiment(
-    assays = list(counts = counts),
+    assays = list(counts = as(countmat, "dgCMatrix")),
     # rowData = rowData,
     colData = metadata,
     spatialCoordsNames = coord_names)
   }else if(return_type == "SCE"){
     # construct 'SingleCellExperiment'
     sxe <- SingleCellExperiment::SingleCellExperiment(
-      assays = list(counts = counts),
+      assays = list(counts = as(countmat, "dgCMatrix")),
       colData = metadata
     )
   }
   
-  if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
+  # if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

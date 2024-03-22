@@ -108,19 +108,19 @@ readStarmapplusSXE <- function(dirname = dirname,
   
   if(return_type == "SPE"){
     sxe <- SpatialExperiment::SpatialExperiment(
-      assays = list(counts = countmat),
+      assays = list(counts = as(countmat, "dgCMatrix")),
       # rowData = rowData,
       colData = metadata,
       spatialCoordsNames = coord_names)
   }else if(return_type == "SCE"){
     # construct 'SingleCellExperiment'
     sxe <- SingleCellExperiment::SingleCellExperiment(
-      assays = list(counts = countmat),
+      assays = list(counts = as(countmat, "dgCMatrix")),
       colData = metadata
     )
   }
   
-  if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
+  # if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

@@ -95,7 +95,7 @@ readMerscopeSXE <- function(dirname = dirname,
   
   # Count matrix 
   rownames(countmat) <- countmat$cell + 1 # fix the indexing to start at 1
-  counts <- t(subset(countmat, select = -cell))
+  countmat <- t(subset(countmat, select = -cell))
   
   # rowData (does not exist)
   
@@ -110,19 +110,19 @@ readMerscopeSXE <- function(dirname = dirname,
   if(return_type == "SPE"){
     # construct 'SpatialExperiment'
     sxe <- SpatialExperiment::SpatialExperiment(
-      assays = list(counts = counts),
+      assays = list(counts = as(countmat, "dgCMatrix")),
       # rowData = rowData,
       colData = metadata,
       spatialCoordsNames = coord_names)
     }else if(return_type == "SCE"){
       # construct 'SingleCellExperiment'
       sxe <- SingleCellExperiment::SingleCellExperiment(
-        assays = list(counts = counts),
+        assays = list(counts = as(countmat, "dgCMatrix")),
         colData = metadata
       )
     }
   
-  if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
+  # if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
   
