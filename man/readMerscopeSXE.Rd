@@ -43,18 +43,18 @@ MERSCOPE_folder/ \cr
 · | — cell_metadata.csv \cr
 }
 \examples{
+# A relatively small data download can be from:
 \dontrun{
-# Data download is from: 
 https://console.cloud.google.com/storage/browser/vz-ffpe-showcase/
 HumanOvarianCancerPatient2Slice2?pageState=(\%22StorageObjectListTable\%22:
 (\%22f\%22:\%22\%255B\%255D\%22))&prefix=&forceOnObjectsSortingFiltering=false
+}
 
-# Here as an example, we have downsized the count matrix and meta data file to 
-# only around 450 randomly selected cells and 20 genes, and necessary columns 
-# of the metadata. 
+# A mock counts and mock metadata with spatial location generated for a 9 genes by 
+# 8 cells object is in /extdata: 
 
 merpath <- system.file(
-  file.path("extdata", "VizgenMERSCOPE"),
+  file.path("extdata", "MERSCOPE_small"),
   package = "SpatialExperimentIO")
   
 list.files(merpath)
@@ -63,9 +63,8 @@ list.files(merpath)
 mer_spe <- readMerscopeSXE(dirname = merpath)
 mer_sce <- readMerscopeSXE(dirname = merpath, return_type = "SCE")
 
-}
 
 }
 \author{
-Estella Yixing Dong
+Yixing Estella Dong
 }

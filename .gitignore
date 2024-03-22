@@ -2,6 +2,8 @@
 .Rhistory
 .Rapp.history
 .Rbuildignore
+.DS_Store
+tests/test_realdata_secretely.R
 
 # Session Data files
 .RData

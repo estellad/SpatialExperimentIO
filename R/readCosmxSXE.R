@@ -29,19 +29,19 @@
 #' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
 #' 
-#' @author Estella Yixing Dong
+#' @author Yixing Estella Dong
 #'
 #' @examples
+#' # A relatively small data download can be from:
 #' \dontrun{
-#' # Data download is from: 
-#' # https://nanostring.com/resources/smi-ffpe-dataset-lung9-rep1-data/
+#' https://nanostring.com/resources/smi-ffpe-dataset-lung9-rep1-data/
+#' }
 #' 
-#' # Here as an example, we have downsized the count matrix and meta data file 
-#' # to only 453 randomly selected cells and 20 genes, and necessary columns 
-#' # of the metadata. 
+#' # A mock counts and mock metadata with spatial location generated for a 8 genes by 
+#' # 9 cells object is in /extdata: 
 #' 
 #' cospath <- system.file(
-#'   file.path("extdata", "NanostringCosMx"),
+#'   file.path("extdata", "CosMx_small"),
 #'   package = "SpatialExperimentIO")
 #'   
 #' list.files(cospath)
@@ -50,56 +50,74 @@
 #' cos_spe <- readCosmxSXE(dirname = cospath)
 #' cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
 #' 
-#' }
 #' 
 #' @importFrom SpatialExperiment SpatialExperiment
-#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
+#' @importFrom methods as
+#' @importFrom utils read.csv
 readCosmxSXE <- function(dirname = dirname, 
                          return_type = "SPE",
                          countmatfpattern = "exprMat_file.csv", 
                          metadatafpattern = "metadata_file.csv", 
-                         coord_names = c("CenterX_global_px",
-                                         "CenterY_global_px")){
+                         coord_names = c("CenterX_global_px", "CenterY_global_px")){
   
   if(!return_type %in% c("SPE", "SCE")){
     stop("'return_type' must be one of c('SPE', 'SCE')")
   }
   
-  countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
-  metadata_file <- file.path(dirname, list.files(dirname, metadatafpattern))
+  ## Metadata sanity check 
+  if(!any(file.exists(file.path(dirname, list.files(dirname, metadatafpattern))))){
+    stop("CosMx metadata file does not exist in the directory. Expect 'metadata_file.csv' in `dirname`")
+  }
   
+  metadata_file <- file.path(dirname, list.files(dirname, metadatafpattern))
+  if(length(metadata_file) > 1){
+    stop("More than one metadata file possible with the provided pattern `metadatafpattern`")
+  }
+  
+  ## Count matrix sanity check
+  if(!any(file.exists(file.path(dirname, list.files(dirname, countmatfpattern))))){
+    stop("CosMx count matrix does not exist in the directory. Expect 'exprMat_file.csv' in `dirname`")
+  }
+  
+  countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
+  if(length(countmat_file) > 1){
+    stop("More than one count matrix file possible with the provided pattern `countmatfpattern`")
+  }
+
   # Read in 
   countmat <- read.csv(countmat_file)
   metadata <- read.csv(metadata_file)
   
   # Count matrix   
-  counts <- merge(countmat, metadata[, c("fov", "cell_ID")])
-  counts <- subset(counts, select = -c(fov, cell_ID))
-  counts <- t(counts)
+  counts_ <- merge(countmat, metadata[, c("fov", "cell_ID")])
+  counts_ <- subset(counts_, select = -c(fov, cell_ID))
+  counts_ <- t(counts_)
   
   # rowData (does not exist)
   
-  # colData
-  colData <- merge(metadata, countmat[, c("fov", "cell_ID")])
+  # metadata
+  metadata <- merge(metadata, countmat[, c("fov", "cell_ID")])
   
+  if(!all(coord_names %in% colnames(metadata))){
+    stop("`coord_names` not in columns of `metadatafpattern`. For CosMx, expect c('CenterX_global_px', 'CenterY_global_px') in the columns of the metadata 'metadata_file.csv'. " )
+  }
   
-  colnames(counts) <- rownames(colData) <- 1:ncol(counts)
+  colnames(counts_) <- rownames(metadata) <- seq_len(ncol(counts_))
   
   if(return_type == "SPE"){
   sxe <- SpatialExperiment::SpatialExperiment(
-    assays = list(counts = counts),
+    assays = list(counts = as(counts_, "dgCMatrix")),
     # rowData = rowData,
-    colData = colData,
+    colData = metadata,
     spatialCoordsNames = coord_names)
   }else if(return_type == "SCE"){
     # construct 'SingleCellExperiment'
     sxe <- SingleCellExperiment::SingleCellExperiment(
-      assays = list(counts = counts),
-      colData = colData
+      assays = list(counts = as(counts_, "dgCMatrix")),
+      colData = metadata
     )
   }
-  
-  if(class(counts(sxe)) != "dgCMatrix"){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

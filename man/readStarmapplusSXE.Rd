@@ -13,58 +13,47 @@ readStarmapplusSXE(
 )
 }
 \arguments{
-\item{dirname}{a directory path to CosMx download that contains files of interest.}
+\item{dirname}{a directory path to STARmap PLUS download that contains files of interest.}
 
 \item{return_type}{option of \code{"SPE"} or \code{"SCE"}, stands for
 \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}}
 
 \item{countmatfpattern}{a filename pattern for the count matrix. Default value is
-\code{"exprMat_file.csv"}, and there is no need to change.}
+\code{"raw_expression_pd.csv"}, and there is no need to change.}
 
 \item{metadatafpattern}{a filename pattern for the metadata .csv file that
-contains spatial coords. Default value is \code{"metadata_file.csv"}, and
+contains spatial coords. Default value is \code{"spatial.csv"}, and
 there is no need to change.}
 
-\item{coord_names}{a vector of two strings specify the spatial coord names.
-Default value is \code{c("CenterX_global_px", "CenterY_global_px")}, and
-there is no need to change.}
+\item{coord_names}{a vector of three strings specify the spatial coord names.
+Default value is \code{c("X", "Y", "Z")}, and there is no need to change.}
 }
 \value{
 a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object
 }
 \description{
-Creates a \code{\link{SpatialExperiment}} from the downloaded unzipped CosMx
-directory for Nanostring CosMx spatial gene expression data.
+Creates a \code{\link{SpatialExperiment}} from the downloaded STARmap PLUS count
+matrix.csv and metadata.csv
 }
 \details{
-The constructor assumes the downloaded unzipped CosMx folder has the following
+The constructor assumes the downloaded unzipped STARmap PLUS folder has the following
 structure, with two mandatory files:
-CosMx_unzipped/optional_default_folder/ \cr
-· | — *_exprMat_file.csv \cr
-· | — *_metadata_file.csv \cr
+STARmap_PLUS_download/ \cr
+· | — *raw_expression_pd.csv \cr
+· | — *spatial.csv \cr
 }
 \examples{
+# A relatively small data download can be from:
 \dontrun{
-# Data download is from: 
-# https://zenodo.org/records/8327576
+https://zenodo.org/records/8327576
+}
 
-TODO: not this ~ ---------------------------------
+# A mock counts and mock metadata with spatial location generated for a 8 genes by 
+# 9 cells object is in /extdata: 
+
 starpath <- system.file(
-  file.path("extdata", "STARmap_PLUS"),
+  file.path("extdata", "STARmapPLUS_small"),
   package = "SpatialExperimentIO")
---------------------------------------------------
-  
-TODO: But something like this! -------------------
-starpath <- "path/to/a/defined/folder/"
-
-eh <- ExperimentHub()
-query(eh, c("scSpatialExperimentData", "STARmap_PLUS"))
-
-count.dat <- eh[["EH7543"]]
-write.csv(count.dat, file.path(starpath, "raw_expression_pd.csv")
-col.dat <- eh[["EH7544"]]
-write.csv(col.dat, file.path(starpath, "spatial.csv")
---------------------------------------------------
 
 list.files(starpath)
 
@@ -72,9 +61,8 @@ list.files(starpath)
 star_spe <- readStarmapplusSXE(dirname = starpath)
 star_sce <- readStarmapplusSXE(dirname = starpath, return_type = "SCE")
 
-}
 
 }
 \author{
-Estella Yixing Dong
+Yixing Estella Dong
 }

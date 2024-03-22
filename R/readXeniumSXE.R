@@ -10,12 +10,12 @@
 #' files of interest.
 #' @param return_type option of \code{"SPE"} or \code{"SCE"}, stands for 
 #' \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}
-#' @param countfname a folder directory or the h5 file for the count matrix. 
+#' @param countmatfpattern a folder directory or the h5 file pattern for the count matrix. 
 #' Default value is \code{"cell_feature_matrix.h5"}, alternative value is 
 #' \code{"cell_feature_matrix"} that takes a bit longer. The count matrix is 
 #' read in and stored in a \code{SingleCellExperiment} object, using 
 #' \code{DropletUtils::read10xCounts()}
-#' @param coordfpattern a filename pattern of the zipped .csv file that 
+#' @param metadatafpattern a filename pattern of the zipped .csv file that 
 #' contains spatial coords. Default value is \code{"cells.csv.gz"}, and there is no 
 #' need to change.
 #' @param coord_names a vector of two strings specify the spatial coord names. 
@@ -37,16 +37,17 @@
 #' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
 #'
-#' @author Estella Yixing Dong
+#' @author Yixing Estella Dong
 #'
 #' @examples
-#' \dontrun{
-#' # Data download is from: 
-#' # https://cf.10xgenomics.com/samples/xenium/1.0.2/Xenium_V1_FF_Mouse_Brain_
-#' # Coronal_Subset_CTX_HP/Xenium_V1_FF_Mouse_Brain_Coronal_Subset_CTX_HP_outs.zip
+#' # A relatively small data set is the Xenium mouse brain data that can be 
+#' # downloaded from 10X website.
+#' 
+#' # A mock .h5 and mock metadata with spatial location generated for a 4 genes by 
+#' # 6 cells object is in /extdata: 
 #' 
 #' xepath <- system.file(
-#'   file.path("extdata", "10xXenium"),
+#'   file.path("extdata", "Xenium_small"),
 #'   package = "SpatialExperimentIO")
 #'   
 #' list.files(xepath)
@@ -54,52 +55,98 @@
 #' # One of the following depending on your input (.h5 or folder) and output 
 #' # (`SPE` or `SCE`) requirement.
 #' xe_spe <- readXeniumSXE(dirname = xepath)
-#' xe_spe <- readXeniumSXE(dirname = xepath, countfname = "cell_feature_matrix")
+#' \dontrun{
+#' xe_spe <- readXeniumSXE(dirname = xepath, countmatfpattern = "cell_feature_matrix")
+#' }
 #' xe_sce <- readXeniumSXE(dirname = xepath, return_type = "SCE")
 #' 
 #' # Subset to no control genes, and the same needed for `xe_sce` if read in as 
 #' # `SCE`.
+#' \dontrun{
 #' xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-#'
 #' }
+#'
 #' @importFrom DropletUtils read10xCounts
 #' @importFrom SpatialExperiment SpatialExperiment
-#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
+#' @importFrom methods as
+#' @importFrom utils read.csv
 readXeniumSXE <- function(dirname, 
                           return_type = "SPE",
-                          countfname = "cell_feature_matrix.h5",
-                          coordfpattern = "cells.csv.gz", 
+                          countmatfpattern = "cell_feature_matrix.h5",
+                          metadatafpattern = "cells.csv.gz", 
                           coord_names = c("x_centroid", "y_centroid")){
-  
+
   if(!return_type %in% c("SPE", "SCE")){
     stop("'return_type' must be one of c('SPE', 'SCE')")
   }
   
-  countfpath <- file.path(dirname, countfname)
-  coord_file <- file.path(dirname, list.files(dirname, coordfpattern))
+  ## Metadata sanity check 
+  if(!any(file.exists(file.path(dirname, list.files(dirname, metadatafpattern))))){
+    stop("Xenium metadata file does not exist in the directory. Expect 'cells.csv.gz' in `dirname`")
+  }
+  
+  metadata_file <- file.path(dirname, list.files(dirname, metadatafpattern))
+  if(length(metadata_file) > 1){
+    stop("More than one metadata file possible with the provided pattern `metadatafpattern`")
+  }
+  
+  ## Count matrix sanity check
+  if(!any(file.exists(file.path(dirname, list.files(dirname, countmatfpattern))))){
+    stop("Xenium count matrix .h5 file or directory does not exist in the directory. Expect 'cell_feature_matrix.h5' or folder `/cell_feature_matrix` in `dirname`")
+  }
+  
+  countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
+  
+  # .h5 file 
+  if(grepl(".h5", countmatfpattern)){
+    if(length(countmat_file) > 1){
+      stop("More than one count matrix .h5 file possible with the provided pattern `countmatfpattern`")
+    }
+  }
+  
+  # folder 
+  if(!grepl(".h5", countmatfpattern)){
+    folders <- list.files(dirname, countmatfpattern)[!grepl(".h5", list.files(dirname, countmatfpattern))]
+    countmat_file <- file.path(dirname, folders)
+    
+    if(length(dir.exists(countmat_file)) > 1){
+      stop("More than one count matrix folder possible with the provided pattern `countmatfpattern`")
+    }
+    
+    if(!all(c("barcodes.tsv.gz", "features.tsv.gz", "matrix.mtx.gz") %in% list.files(countmat_file))){
+      stop("For Xenium with count matrix directory input, expect '/cell_feature_matrix' folder contains files 'barcodes.tsv.gz', 'features.tsv.gz', 'matrix.mtx.gz'")
+    }
+    
+  }
+
   
   # Count matrix + rowData
-  sce <- DropletUtils::read10xCounts(countfpath, col.names = TRUE)
+  sce <- DropletUtils::read10xCounts(countmat_file, col.names = TRUE)
   
-  # Spatial and colData
-  colData <- read.csv(gzfile(coord_file), header = TRUE)
+  # Spatial and metadata
+  metadata <- read.csv(gzfile(metadata_file), header = TRUE)
+  
+  if(!all(coord_names %in% colnames(metadata))){
+    stop("`coord_names` not in columns of `metadatafpattern`. For Xenium, expect c('x_centroid', 'y_centroid') in the columns of the metadata 'cells.csv.gz'. " )
+  }
   
   if(return_type == "SPE"){
     # construct 'SpatialExperiment'
     sxe <- SpatialExperiment::SpatialExperiment(
-      assays = assays(sce),
+      assays = list(counts = as(counts(sce), "dgCMatrix")),
       rowData = rowData(sce),
-      colData = colData,
+      colData = metadata,
       spatialCoordsNames = coord_names
     )
   }else if(return_type == "SCE"){
     # construct 'SingleCellExperiment'
-    rownames(colData) <- colnames(sce)
-    colData(sce) <- as(colData, "DFrame")
-    sxe <- sce
+    sxe <- SingleCellExperiment::SingleCellExperiment(
+      assays = list(counts = as(counts(sce), "dgCMatrix")),
+      rowData = rowData(sce),
+      colData = metadata
+    )
   }
-  
-  if(class(counts(sxe)) != "dgCMatrix"){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

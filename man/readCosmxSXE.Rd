@@ -44,16 +44,16 @@ CosMx_unzipped/optional_default_folder/ \cr
 · | — *_metadata_file.csv \cr
 }
 \examples{
+# A relatively small data download can be from:
 \dontrun{
-# Data download is from: 
-# https://nanostring.com/resources/smi-ffpe-dataset-lung9-rep1-data/
+https://nanostring.com/resources/smi-ffpe-dataset-lung9-rep1-data/
+}
 
-# Here as an example, we have downsized the count matrix and meta data file 
-# to only 453 randomly selected cells and 20 genes, and necessary columns 
-# of the metadata. 
+# A mock counts and mock metadata with spatial location generated for a 8 genes by 
+# 9 cells object is in /extdata: 
 
 cospath <- system.file(
-  file.path("extdata", "NanostringCosMx"),
+  file.path("extdata", "CosMx_small"),
   package = "SpatialExperimentIO")
   
 list.files(cospath)
@@ -62,9 +62,8 @@ list.files(cospath)
 cos_spe <- readCosmxSXE(dirname = cospath)
 cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
 
-}
 
 }
 \author{
-Estella Yixing Dong
+Yixing Estella Dong
 }

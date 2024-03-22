@@ -32,53 +32,54 @@ After reading in the data, we need to look at the landscape of other downstream 
 
 Therefore, to avoid the pain of object conversion, we give the flexibility to let the user decide what object type to return.
 
-
 # Setup
+
 ```{r, warning=FALSE, message=FALSE}
 library(SpatialExperimentIO)
 library(SpatialExperiment)
-library(ggplot2)
+# library(ggplot2)
 ```
 
 # Quick Start
-* For Xenium data:
+
+-   For Xenium data:
 
 ```{r, eval=FALSE}
-### DO NOT RUN. Example code.
-xepath <- "/path/to/folder"
-# a. Xenium as SPE
-xe_spe <- readXeniumSXE(dirname = xepath)
-#    Subset to no control genes
-xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-
-# b. Xenium as SCE
-xe_sce <- readXeniumSXE(dirname = xepath, return_type = "SCE")
-#    Subset to no control genes
-xe_sce <- xe_sce[rowData(xe_sce)$Type == "Gene Expression"]
+# ### DO NOT RUN. Example code.
+# xepath <- "/path/to/folder"
+# # a. Xenium as SPE
+# xe_spe <- readXeniumSXE(dirname = xepath)
+# #    Subset to no control genes
+# xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
+# 
+# # b. Xenium as SCE
+# xe_sce <- readXeniumSXE(dirname = xepath, return_type = "SCE")
+# #    Subset to no control genes
+# xe_sce <- xe_sce[rowData(xe_sce)$Type == "Gene Expression"]
 ```
 
-* For CosMx data:
+-   For CosMx data:
 
 ```{r, eval=FALSE}
-### DO NOT RUN. Example code.
-cospath <- "/path/to/folder"
-# a. CosMx as SPE
-cos_spe <- readCosmxSXE(dirname = cospath)
-
-# b. CosMx as SCE
-cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
+# ### DO NOT RUN. Example code.
+# cospath <- "/path/to/folder"
+# # a. CosMx as SPE
+# cos_spe <- readCosmxSXE(dirname = cospath)
+# 
+# # b. CosMx as SCE
+# cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
 ```
 
-* For MERSCOPE data:
+-   For MERSCOPE data:
 
 ```{r, eval=FALSE}
-### DO NOT RUN. Example code.
-merpath <- "/path/to/folder"
-# a. MERSCOPE as SPE
-mer_spe <- readMerscopeSXE(dirname = merpath)
-
-# b. MERSCOPE as SCE
-mer_sce <- readMerscopeSXE(dirname = merpath, return_type = "SCE")
+# ### DO NOT RUN. Example code.
+# merpath <- "/path/to/folder"
+# # a. MERSCOPE as SPE
+# mer_spe <- readMerscopeSXE(dirname = merpath)
+# 
+# # b. MERSCOPE as SCE
+# mer_sce <- readMerscopeSXE(dirname = merpath, return_type = "SCE")
 
 ```
 
@@ -86,17 +87,13 @@ That is pretty much all you need. To learn more details, please read the below s
 
 # Xenium
 
-Xenium is a imaging-based spatial transcriptomics technology developed by 10x Genomics [1]. Compared to the full transcriptome coverage sequencing-based technology Visium, Xenium allows for transcript-level resolution count detection but with less genes. The transcripts are segmented into single cells and `SpatialExperimentIO` returns the cell-level `SPE` or `SCE` object. To read more about Xenium technology workflow, please refer to the [Xenium technology overview](https://www.10xgenomics.com/blog/spatially-resolved-transcriptomics-an-introductory-overview-of-spatial-gene-expression-profiling-methods). For more publicly available Xenium data, please refer to [Xenium data download]().
-
-```{r, echo=FALSE, fig.align='left', out.width="80%"}
-knitr::include_graphics(here::here("www/Xenium_Technology_Workflow.png"), error = FALSE)
-```
+Xenium is an imaging-based in-situ sequencing technology developed by 10x Genomics. Compared to the full transcriptome coverage sequencing-based technology Visium, Xenium allows for transcript-level resolution count detection but with less genes. The transcripts are segmented into single cells and `SpatialExperimentIO` returns the cell-level `SPE` or `SCE` object. To read more about Xenium technology workflow, please refer to the [Xenium technology overview](https://www.10xgenomics.com/blog/spatially-resolved-transcriptomics-an-introductory-overview-of-spatial-gene-expression-profiling-methods). For more publicly available Xenium data, please refer to [Xenium data download](https://www.10xgenomics.com/datasets?query=Xenium&page=1&configure%5BhitsPerPage%5D=50&configure%5BmaxValuesPerFacet%5D=1000).
 
 The object constructor assumes the downloaded unzipped Xenium Output Bundle contains the mandatory file of `cells.csv.gz` and either a folder `/cell_feature_matrix` or a .h5 file `cell_feature_matrix.h5`.
 
 ```{r}
 xepath <- system.file(
-  file.path("extdata", "10xXenium"),
+  file.path("extdata", "Xenium_small"),
   package = "SpatialExperimentIO")
 
 list.files(xepath)
@@ -110,15 +107,15 @@ We commented out the default specification of each variable in `readXeniumSXE()`
 # # read the count matrix .h5 file - automatically DropletUtils::read10xCounts(type = "HDF5")
 # xe_spe <- readXeniumSXE(dirname = xepath, 
 #                         return_type = "SPE",
-#                         countfname = "cell_feature_matrix.h5", 
-#                         coordfpattern = "cells.csv.gz", 
+#                         countmatfpattern = "cell_feature_matrix.h5", 
+#                         metadatafpattern = "cells.csv.gz", 
 #                         coord_names = c("x_centroid", "y_centroid"))
 
 xe_spe <- readXeniumSXE(dirname = xepath)
 xe_spe
 ```
 
-Additionally, Xenium gives four types of genes in their gene panel (check with `table(rowData(xe_spe)$Type)` to see). You should subset to gene types that are `"Gene Expression"` to focus on non-control genes for downstream analysis. Afterwards, we obtain a Xenium mouse brain dataset with 248 genes.
+Additionally, Xenium gives four types of genes in their gene panel (check with `table(rowData(xe_spe)$Type)` to see). You should subset to gene types that are `"Gene Expression"` to focus on non-control genes for downstream analysis. In this example, we obtain a Xenium dataset with 4 genes all with type of `"Gene Expression"` and 6 cells just for illustration.
 
 ```{r}
 # Subset to no control genes                         
@@ -129,18 +126,19 @@ xe_spe
 If you do not have `cell_feature_matrix.h5` but the folder `/cell_feature_matrix` instead, it should contain the following files.
 
 ```{r}
-list.files(file.path(xepath, "cell_feature_matrix"))
+# list.files(file.path(xepath, "cell_feature_matrix"))
+# "barcodes.tsv.gz" "features.tsv.gz" "matrix.mtx.gz"
 ```
 
-Now you can read in Xenium by specifying `countfname` as the folder `"cell_feature_matrix"`. You should also subset to `"Gene Expression"` gene type like previously.
+For this example, we only provide `cell_feature_matrix.h5` for demonstration. However, alternatively you can read in Xenium by specifying `countmatfpattern` as the folder `"cell_feature_matrix"`. You should also subset to `"Gene Expression"` gene type like previously.
 
 ```{r}
-# or read the count matrix folder - automatically DropletUtils::read10xCounts(type = "sparse") 
-xe_spe <- readXeniumSXE(dirname = xepath, 
-                        countfname = "cell_feature_matrix")
-# Subset to no control genes                         
-xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-xe_spe
+# # or read the count matrix folder - automatically DropletUtils::read10xCounts(type = "sparse") 
+# xe_spe <- readXeniumSXE(dirname = xepath, 
+#                         countmatfpattern = "cell_feature_matrix")
+# # Subset to no control genes                         
+# xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
+# xe_spe
 ```
 
 ## Read Xenium as a `SingleCellExperiment` object
@@ -148,44 +146,24 @@ xe_spe
 Instead, if you are interested in storing the `spatialCoords()` columns in `colData` and read Xenium in as a `SingleCellExperiment`, you need to change `readXeniumSXE(return_type = )` to `"SCE"`. It is also required to subset to `"Gene Expression"` gene type. We end up with an `SCE` object with 248 genes.
 
 ```{r}
-xe_sce <- readXeniumSXE(dirname = xepath, 
-                        return_type = "SCE")
+xe_sce <- readXeniumSXE(dirname = xepath, return_type = "SCE")
 xe_sce <- xe_sce[rowData(xe_sce)$Type == "Gene Expression"]
 xe_sce
 ```
 
-This is a small section of a Xenium mouse brain. Some Xenium data set can have a dimension of 313 genes and around 110,000 cells in the [Xenium human breast cancer data](https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast).
-
-We can now do some quick visualization with the `SPE` or the `SCE` object. Here we visualize the Xenium `SCE` object's spatial distribution of library size.
-
-```{r, warning=FALSE}
-xe_sce$libsize <- colSums(counts(xe_sce))
-CD <- data.frame(colData(xe_sce))
-
-ggplot(CD, aes(x = x_centroid, y = y_centroid, color = libsize)) + 
-  geom_point(size = 0.1) + 
-  theme_bw()
-```
+This is a mock Xenium datasets with 4 genes by 6 cells. Some Xenium data set can have a dimension of 313 genes and around 110,000 cells in the [Xenium human breast cancer data](https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast).
 
 For more visualization tools for spatial transcriptomics downstream data analysis, including helpers for QC, marker gene expression level and clustering results on reduced dimensions or its spatial distribution, please refer to `BiocManager::install("ggspavis")`.
 
 # CosMx
 
-CosMx is a technology by Nanostring [2].
-
-To read more about the CosMx technology workflow, please refer to the [technology overview](https://nanostring.com/products/cosmx-spatial-molecular-imager/single-cell-imaging-overview/).
-
-```{r, echo=FALSE, fig.width=5, fig.align='left'}
-knitr::include_graphics(here::here("www/CosMx_Technology_Workflow.png"), error = FALSE)
-```
-
-For more publicly available data sets, please refer to the CosMx data download [website](https://nanostring.com/products/cosmx-spatial-molecular-imager/ffpe-dataset/?utm_source=google&utm_medium=paidsearch&utm_campaign=dynamic&utm_id=NSTG_DynamicSearch&utm_source=google&utm_medium=cpc&utm_campaign=1765548394&utm_agid=132844584222&utm_term=&creative=592729435866&device=c&placement=&network=g&gad_source=1&gclid=EAIaIQobChMI5M-sztjIggMVZZFoCR1MLgFiEAAYASAAEgJ1L_D_BwE).
+CosMx is an imaging-based in-situ sequencing technology by Nanostring. To read more about the CosMx technology workflow, please refer to the [technology overview](https://nanostring.com/products/cosmx-spatial-molecular-imager/single-cell-imaging-overview/). For more publicly available data sets, please refer to the CosMx data download [website](https://nanostring.com/products/cosmx-spatial-molecular-imager/ffpe-dataset/?utm_source=google&utm_medium=paidsearch&utm_campaign=dynamic&utm_id=NSTG_DynamicSearch&utm_source=google&utm_medium=cpc&utm_campaign=1765548394&utm_agid=132844584222&utm_term=&creative=592729435866&device=c&placement=&network=g&gad_source=1&gclid=EAIaIQobChMI5M-sztjIggMVZZFoCR1MLgFiEAAYASAAEgJ1L_D_BwE).
 
 The object constructor assumes the data download folder contains two mandatory files with `exprMat_file.csv` and `metadata_file.csv` in the names.
 
 ```{r}
 cospath <- system.file(
-  file.path("extdata", "NanostringCosMx"),
+  file.path("extdata", "CosMx_small"),
   package = "SpatialExperimentIO")
 
 list.files(cospath)
@@ -193,7 +171,7 @@ list.files(cospath)
 
 ## Read CosMx as a `SpatialExperiment` object
 
-We commented out the default specification of each variable in `readCosmxSXE()`. To read in CosMx as a `SpatialExperiment` object, you would only need to provide a valid directory name. With this example dataset, we obtained a CosMx `SPE` object with 20 genes.
+We commented out the default specification of each variable in `readCosmxSXE()`. To read in CosMx as a `SpatialExperiment` object, you would only need to provide a valid directory name. With this example dataset, we obtained a CosMx `SPE` object with 8 genes and 9 cells.
 
 ```{r}
 # cos_spe <- readCosmxSXE(dirname = cospath,
@@ -216,42 +194,17 @@ cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
 cos_sce
 ```
 
-Here we visualize the CosMx `SPE` object's spatial distribution of library size.
-
-```{r, warning=FALSE}
-cos_spe$libsize <- colSums(counts(cos_spe))
-CD <- data.frame(cbind(colData(cos_spe), spatialCoords(cos_spe)))
-
-ggplot(CD, aes(x = CenterX_global_px, y = CenterY_global_px, color = libsize)) + 
-  geom_point(size = 0.1) + 
-  theme_bw()
-```
-
-With this small toy data set, we have limited to only two field of views and 453 cells for the convenience of data storage.
-
-```{r}
-table(cos_spe$fov)
-```
-
 In reality, a CosMx data set can have a dimension of 980 genes and around 100,000 cells for the [human lung cancer data](https://nanostring.com/products/cosmx-spatial-molecular-imager/ffpe-dataset/nsclc-ffpe-dataset/?utm_source=google&utm_medium=paidsearch&utm_campaign=dynamic&utm_id=NSTG_DynamicSearch&utm_source=google&utm_medium=cpc&utm_campaign=1765548394&utm_agid=132844584222&utm_term=&creative=592729435866&device=c&placement=&network=g&gad_source=1&gclid=EAIaIQobChMIv-DvtO_IggMVlotoCR0qtgdxEAAYASAAEgKi0vD_BwE).
 
 # MERSCOPE
 
-MERSCOPE integrated MERFISH spatial transcriptomics technology with high resolution spatial imaging, fluidics, image processing [3].
-
-```{r, echo=FALSE, fig.width=5, fig.align='left', out.width="80%"}
-knitr::include_graphics(here::here("www/MERFISH_Technology_Workflow.png"), error = FALSE)
-```
-
-To understand more about the MERFISH technology behind MERSCOPE, please refer to the [MERFISH Technology Overview](https://vizgen.com/technology/#merfish).
-
-For more publicly available MERSCOPE data, please see [MERSCOPE data download page](https://info.vizgen.com/ffpe-showcase).
+MERSCOPE integrated MERFISH spatial transcriptomics technology with high resolution spatial imaging, fluidics, image processing, and is a product by Vizgen. To understand more about the MERFISH technology behind MERSCOPE, please refer to the [MERFISH Technology Overview](https://vizgen.com/technology/#merfish). For more publicly available MERSCOPE data, please see [MERSCOPE data download page](https://info.vizgen.com/ffpe-showcase).
 
 The object constructor assumes the data download folder contains two mandatory files with `cell_by_gene.csv` and `cell_metadata.csv` in the names.
 
 ```{r}
 merpath <- system.file(
-  file.path("extdata", "VizgenMERSCOPE"),
+  file.path("extdata", "MERSCOPE_small"),
   package = "SpatialExperimentIO")
 
 list.files(merpath)
@@ -259,7 +212,7 @@ list.files(merpath)
 
 ## Read MERSCOPE as a `SpatialExperiment` object
 
-We commented out the default specification of each variable in `readMerscopeSXE()`. To read in MERSCOPE as a `SpatialExperiment` object, you would only need to provide a valid directory name. With this example dataset, we obtained a MERSCOPE `SPE` object with 20 genes.
+We commented out the default specification of each variable in `readMerscopeSXE()`. To read in MERSCOPE as a `SpatialExperiment` object, you would only need to provide a valid directory name. With this example dataset, we obtained a MERSCOPE `SPE` object with 9 genes and 8 cells.
 
 ```{r}
 # mer_spe <- readMerscopeSXE(dirname = merpath, 
@@ -281,50 +234,46 @@ mer_sce <- readMerscopeSXE(dirname = merpath, return_type = "SCE")
 mer_sce
 ```
 
-Here we visualize the MERSCOPE `SCE` object's spatial distribution of library size.
-
-```{r, warning=FALSE}
-mer_sce$libsize <- colSums(counts(mer_sce))
-CD <- data.frame(cbind(colData(mer_sce)))
-
-ggplot(CD, aes(x = center_x, y = center_y, color = libsize)) + 
-  geom_point(size = 0.1) + 
-  theme_bw()
-```
-
-With this small toy data set, we have limited to only a subset of field of views with 450 cells for the convenience of data storage.
-
-```{r}
-dim(mer_spe)[2]
-```
 
 In reality, a MERSCOPE data set can have a dimension of 550 genes and around 250,000 cells for the [human ovarian cancer data](https://console.cloud.google.com/storage/browser/vz-ffpe-showcase/HumanOvarianCancerPatient2Slice1?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))).
 
 # STARmap PLUS
-In situ sequencing method, technology first introduced: https://pubmed.ncbi.nlm.nih.gov/36732642/,
 
-Data used are mentioned in paper: https://www.nature.com/articles/s41586-023-06569-5
+STARmap PLUS is an imaging-based in-situ sequencing technology that has been introduced by [Zeng et al.](https://pubmed.ncbi.nlm.nih.gov/36732642/). The object constructor assumes the data download folder contains two mandatory files with `raw_expression_pd.csv` and `spatial.csv` in the names.
 
-Data description is from: https://www.spatial-atlas.net/Brain/
-Downloaded from, and for more data: https://zenodo.org/records/8327576
+```{r}
+starpath <- system.file(
+  file.path("extdata", "STARmapPLUS_small"),
+  package = "SpatialExperimentIO")
+
+list.files(starpath)
+```
 
 ## Read STARmap PLUS as a `SpatialExperiment` object
 
+We comment out the default parameters for your reference. In this example dataset, we provide a sample with 8 genes and 9 cells just for illustration.
+
+```{r}
+# readStarmapplusSXE <- function(dirname = dirname, 
+#                                return_type = "SPE",
+#                                countmatfpattern = "raw_expression_pd.csv", 
+#                                metadatafpattern = "spatial.csv", 
+#                                coord_names = c("X", "Y", "Z"))
+
+star_spe <- readStarmapplusSXE(dirname = starpath)
+star_spe
+```
+
 ## Read STARmap PLUS as a `SingleCellExperiment` object
 
+Alternatively, you can also return a `SingleCellExperiment` object.
 
-## CODEX
-Public dataset: https://help.codex.bio/codex/mav/public-datasets
+```{r}
+star_sce <- readStarmapplusSXE(dirname = starpath, return_type = "SCE")
+star_sce
+```
 
-
-
-# Reference {.smaller}
-
-[1] Xenium technology workflow diagram: <https://www.10xgenomics.com/blog/spatially-resolved-transcriptomics-an-introductory-overview-of-spatial-gene-expression-profiling-methods>
-
-[2] CosMx technology workflow diagram: <https://nanostring.com/products/cosmx-spatial-molecular-imager/single-cell-imaging-overview/>
-
-[3] MERSCOPE technology workflow diagram: <https://vizgen.com/technology/#merfish>
+STARmap PLUS has a gene panel of around 1000 with up to millions of cells depending on the size of the tissue. There are 20 sample on mouse brain with tissue region annotated published by [Shi et al.](https://www.nature.com/articles/s41586-023-06569-5). Their data is avaiable to downloaded from [Zenodo](https://zenodo.org/records/8327576).
 
 # Session Info {.smaller}
 
