@@ -8,8 +8,8 @@ Authors@R: c(
         comment = c(ORCID = "0009-0003-5115-5686")))
 URL: https://github.com/estellad/SpatialExperimentIO
 BugReports: https://github.com/estellad/SpatialExperimentIO/issues
-Description: Read in imaging-based spatial transcriptomics technology data, such as Xenium by 10X Genomics, CosMx by Nanostring, MERSCOPE by Vizgen, or STARmapPLUS from Broad Institute, as a SpatialExperiment or a SingleCellExperiment object. 
-License: MIT + file LICENSE
+Description: Read in imaging-based spatial transcriptomics technology data. Current available modules are for Xenium by 10X Genomics, CosMx by Nanostring, MERSCOPE by Vizgen, or STARmapPLUS from Broad Institute. You can choose to read the data in as a SpatialExperiment or a SingleCellExperiment object. 
+License: Artistic-2.0
 Encoding: UTF-8
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
@@ -30,6 +30,7 @@ biocViews:
   Infrastructure, 
   Transcriptomics, 
   SingleCell, 
-  Spatial
+  Spatial,
+  GeneExpression
 RoxygenNote: 7.3.1
 Config/testthat/edition: 3
