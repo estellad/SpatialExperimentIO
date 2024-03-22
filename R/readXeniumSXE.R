@@ -137,10 +137,17 @@ readXeniumSXE <- function(dirname,
       spatialCoordsNames = coord_names
     )
   }else if(return_type == "SCE"){
+    # # construct 'SingleCellExperiment'
+    # rownames(metadata) <- colnames(sce)
+    # colData(sce) <- as(metadata, "DFrame")
+    # sxe <- sce
+    # 
     # construct 'SingleCellExperiment'
-    rownames(metadata) <- colnames(sce)
-    colData(sce) <- as(metadata, "DFrame")
-    sxe <- sce
+    sxe <- SingleCellExperiment::SingleCellExperiment(
+      assays = list(counts = as(counts(sce), "dgCMatrix")),
+      rowData = rowData(sce),
+      colData = metadata
+    )
   }
   
   # if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
