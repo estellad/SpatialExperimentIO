@@ -44,12 +44,13 @@ CosMx_unzipped/optional_default_folder/ \cr
 · | — *_metadata_file.csv \cr
 }
 \examples{
-\dontrun{
 # A relatively small data download can be from:
+\dontrun{
 https://nanostring.com/resources/smi-ffpe-dataset-lung9-rep1-data/
+}
 
-A mock counts and mock metadata with spatial location generated for a 8 genes by 
-9 cells object is in /extdata: 
+# A mock counts and mock metadata with spatial location generated for a 8 genes by 
+# 9 cells object is in /extdata: 
 
 cospath <- system.file(
   file.path("extdata", "CosMx_small"),
@@ -61,7 +62,6 @@ list.files(cospath)
 cos_spe <- readCosmxSXE(dirname = cospath)
 cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
 
-}
 
 }
 \author{
