@@ -73,7 +73,7 @@ readXeniumSXE <- function(dirname,
                           countmatfpattern = "cell_feature_matrix.h5",
                           metadatafpattern = "cells.csv.gz", 
                           coord_names = c("x_centroid", "y_centroid")){
-  
+
   if(!return_type %in% c("SPE", "SCE")){
     stop("'return_type' must be one of c('SPE', 'SCE')")
   }
@@ -131,7 +131,7 @@ readXeniumSXE <- function(dirname,
   if(return_type == "SPE"){
     # construct 'SpatialExperiment'
     sxe <- SpatialExperiment::SpatialExperiment(
-      assays = assays(sce),
+      assays = list(counts = as(counts(sce), "dgCMatrix")),
       rowData = rowData(sce),
       colData = metadata,
       spatialCoordsNames = coord_names
@@ -143,7 +143,7 @@ readXeniumSXE <- function(dirname,
     sxe <- sce
   }
   
-  if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
+  # if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

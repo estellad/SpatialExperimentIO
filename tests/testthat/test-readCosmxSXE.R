@@ -11,11 +11,11 @@ test_that("example data folders uniquely contains needed files", {
 })
 
 test_that("needed files contains spatial columns of interest", {
-  colData <- read.csv(file.path(dir, "lung_p9s1_metadata_file.csv"))
+  metadata <- read.csv(file.path(dir, "lung_p9s1_metadata_file.csv"))
   
-  expect_true(all(c("CenterX_global_px", "CenterY_global_px") %in% colnames(colData))) 
-  expect_true(is.numeric(colData$CenterX_global_px))
-  expect_true(is.numeric(colData$CenterY_global_px))
+  expect_true(all(c("CenterX_global_px", "CenterY_global_px") %in% colnames(metadata))) 
+  expect_true(is.numeric(metadata$CenterX_global_px))
+  expect_true(is.numeric(metadata$CenterY_global_px))
 })
 
 test_that("data are read correctly to SpatialExperiment class", {
@@ -31,7 +31,7 @@ test_that("data are read correctly to SpatialExperiment class", {
   expect_false(is.null(rownames(x)))
   expect_false(is.null(colnames(x)))
   expect_true(all(dim(x) == c(8, 9)))
-  expect_s4_class(SpatialExperiment::counts(x), "dgCMatrix")
+  expect_s4_class(SingleCellExperiment::counts(x), "dgCMatrix")
 })
 
 test_that("data are read correctly to SingleCellExperiment class", {
@@ -43,9 +43,9 @@ test_that("data are read correctly to SingleCellExperiment class", {
                                     "CenterY_global_px"))
   
   expect_s4_class(x, "SingleCellExperiment")
-  expect_true(all(c("CenterX_global_px", "CenterY_global_px") %in% colnames(SpatialExperiment::colData(x))))
+  expect_true(all(c("CenterX_global_px", "CenterY_global_px") %in% colnames(SingleCellExperiment::colData(x))))
   expect_false(is.null(rownames(x)))
   expect_false(is.null(colnames(x)))
   expect_true(all(dim(x) == c(8, 9)))
-  expect_s4_class(SpatialExperiment::counts(x), "dgCMatrix")
+  expect_s4_class(SingleCellExperiment::counts(x), "dgCMatrix")
 })

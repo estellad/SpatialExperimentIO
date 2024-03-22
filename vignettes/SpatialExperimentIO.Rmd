@@ -13,7 +13,7 @@ output:
 date: "`r format(Sys.Date(), '%b %d, %Y')`"
 vignette: >
     %\VignetteIndexEntry{SpatialExperimentIO Reader Package Overview}
-    %\VignetteEngine{knitr::knitr}
+    %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
 
@@ -37,7 +37,7 @@ Therefore, to avoid the pain of object conversion, we give the flexibility to le
 ```{r, warning=FALSE, message=FALSE}
 library(SpatialExperimentIO)
 library(SpatialExperiment)
-library(ggplot2)
+# library(ggplot2)
 ```
 
 # Quick Start
@@ -153,17 +153,6 @@ xe_sce
 
 This is a mock Xenium datasets with 4 genes by 6 cells. Some Xenium data set can have a dimension of 313 genes and around 110,000 cells in the [Xenium human breast cancer data](https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast).
 
-We can now do some quick visualization with the `SPE` or the `SCE` object. Here we visualize the Xenium `SCE` object's spatial distribution of library size.
-
-```{r, warning=FALSE}
-xe_sce$libsize <- colSums(counts(xe_sce))
-CD <- data.frame(colData(xe_sce))
-
-ggplot(CD, aes(x = x_centroid, y = y_centroid, color = libsize)) + 
-  geom_point(size = 0.1) + 
-  theme_bw()
-```
-
 For more visualization tools for spatial transcriptomics downstream data analysis, including helpers for QC, marker gene expression level and clustering results on reduced dimensions or its spatial distribution, please refer to `BiocManager::install("ggspavis")`.
 
 # CosMx
@@ -203,17 +192,6 @@ Alternatively, you can also read CosMx in as a `SCE`.
 ```{r}
 cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
 cos_sce
-```
-
-Here we visualize the CosMx `SPE` object's spatial distribution of library size.
-
-```{r, warning=FALSE}
-cos_spe$libsize <- colSums(counts(cos_spe))
-CD <- data.frame(cbind(colData(cos_spe), spatialCoords(cos_spe)))
-
-ggplot(CD, aes(x = CenterX_global_px, y = CenterY_global_px, color = libsize)) + 
-  geom_point(size = 0.1) + 
-  theme_bw()
 ```
 
 In reality, a CosMx data set can have a dimension of 980 genes and around 100,000 cells for the [human lung cancer data](https://nanostring.com/products/cosmx-spatial-molecular-imager/ffpe-dataset/nsclc-ffpe-dataset/?utm_source=google&utm_medium=paidsearch&utm_campaign=dynamic&utm_id=NSTG_DynamicSearch&utm_source=google&utm_medium=cpc&utm_campaign=1765548394&utm_agid=132844584222&utm_term=&creative=592729435866&device=c&placement=&network=g&gad_source=1&gclid=EAIaIQobChMIv-DvtO_IggMVlotoCR0qtgdxEAAYASAAEgKi0vD_BwE).
@@ -256,16 +234,6 @@ mer_sce <- readMerscopeSXE(dirname = merpath, return_type = "SCE")
 mer_sce
 ```
 
-Here we visualize the MERSCOPE `SCE` object's spatial distribution of library size.
-
-```{r, warning=FALSE}
-mer_sce$libsize <- colSums(counts(mer_sce))
-CD <- data.frame(cbind(colData(mer_sce)))
-
-ggplot(CD, aes(x = center_x, y = center_y, color = libsize)) + 
-  geom_point(size = 0.1) + 
-  theme_bw()
-```
 
 In reality, a MERSCOPE data set can have a dimension of 550 genes and around 250,000 cells for the [human ovarian cancer data](https://console.cloud.google.com/storage/browser/vz-ffpe-showcase/HumanOvarianCancerPatient2Slice1?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))).
 
@@ -303,17 +271,6 @@ Alternatively, you can also return a `SingleCellExperiment` object.
 ```{r}
 star_sce <- readStarmapplusSXE(dirname = starpath, return_type = "SCE")
 star_sce
-```
-
-Here we visualize the STARmap PLUS `SCE` object's spatial distribution of library size. We only focus on the 2D panel of this mouse brain tissue.
-
-```{r, warning=FALSE}
-star_sce$libsize <- colSums(counts(star_sce))
-CD <- data.frame(cbind(colData(star_sce)))
-
-ggplot(CD, aes(x = X, y = Y, color = libsize)) + 
-  geom_point(size = 0.1) + 
-  theme_bw()
 ```
 
 STARmap PLUS has a gene panel of around 1000 with up to millions of cells depending on the size of the tissue. There are 20 sample on mouse brain with tissue region annotated published by [Shi et al.](https://www.nature.com/articles/s41586-023-06569-5). Their data is avaiable to downloaded from [Zenodo](https://zenodo.org/records/8327576).

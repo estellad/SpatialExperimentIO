@@ -11,11 +11,11 @@ test_that("example data folders uniquely contains needed files", {
 })
 
 test_that("needed files contains spatial columns of interest", {
-  colData <- read.csv(file.path(dir, "ovarian_p2s2_cell_metadata.csv"))
+  metadata <- read.csv(file.path(dir, "ovarian_p2s2_cell_metadata.csv"))
   
-  expect_true(all(c("center_x", "center_y") %in% colnames(colData))) 
-  expect_true(is.numeric(colData$center_x))
-  expect_true(is.numeric(colData$center_y))
+  expect_true(all(c("center_x", "center_y") %in% colnames(metadata))) 
+  expect_true(is.numeric(metadata$center_x))
+  expect_true(is.numeric(metadata$center_y))
 })
 
 test_that("data are read correctly to SpatialExperiment class", {
@@ -30,7 +30,7 @@ test_that("data are read correctly to SpatialExperiment class", {
   expect_false(is.null(rownames(x)))
   expect_false(is.null(colnames(x)))
   expect_true(all(dim(x) == c(9, 8)))
-  expect_s4_class(SpatialExperiment::counts(x), "dgCMatrix")
+  expect_s4_class(SingleCellExperiment::counts(x), "dgCMatrix")
 })
 
 test_that("data are read correctly to SingleCellExperiment class", {
@@ -41,9 +41,9 @@ test_that("data are read correctly to SingleCellExperiment class", {
                        coord_names = c("center_x", "center_y"))
   
   expect_s4_class(x, "SingleCellExperiment")
-  expect_true(all(c("center_x", "center_y") %in% colnames(SpatialExperiment::colData(x))))
+  expect_true(all(c("center_x", "center_y") %in% colnames(SingleCellExperiment::colData(x))))
   expect_false(is.null(rownames(x)))
   expect_false(is.null(colnames(x)))
   expect_true(all(dim(x) == c(9, 8)))
-  expect_s4_class(SpatialExperiment::counts(x), "dgCMatrix")
+  expect_s4_class(SingleCellExperiment::counts(x), "dgCMatrix")
 })
