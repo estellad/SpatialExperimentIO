@@ -32,12 +32,13 @@
 #' @author Yixing Estella Dong
 #'
 #' @examples
-#' \dontrun{
 #' # A relatively small data download can be from:
+#' \dontrun{
 #' https://nanostring.com/resources/smi-ffpe-dataset-lung9-rep1-data/
+#' }
 #' 
-#' A mock counts and mock metadata with spatial location generated for a 8 genes by 
-#' 9 cells object is in /extdata: 
+#' # A mock counts and mock metadata with spatial location generated for a 8 genes by 
+#' # 9 cells object is in /extdata: 
 #' 
 #' cospath <- system.file(
 #'   file.path("extdata", "CosMx_small"),
@@ -49,7 +50,6 @@
 #' cos_spe <- readCosmxSXE(dirname = cospath)
 #' cos_sce <- readCosmxSXE(dirname = cospath, return_type = "SCE")
 #' 
-#' }
 #' 
 #' @importFrom SpatialExperiment SpatialExperiment
 #' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
@@ -103,7 +103,7 @@ readCosmxSXE <- function(dirname = dirname,
     stop("`coord_names` not in columns of `metadatafpattern`. For CosMx, expect c('CenterX_global_px', 'CenterY_global_px') in the columns of the metadata 'metadata_file.csv'. " )
   }
   
-  colnames(counts_) <- rownames(metadata) <- 1:ncol(counts_)
+  colnames(counts_) <- rownames(metadata) <- seq_len(ncol(counts_))
   
   if(return_type == "SPE"){
   sxe <- SpatialExperiment::SpatialExperiment(
@@ -118,8 +118,6 @@ readCosmxSXE <- function(dirname = dirname,
       colData = metadata
     )
   }
-  
-  # if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

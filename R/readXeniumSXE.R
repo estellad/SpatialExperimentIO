@@ -40,11 +40,11 @@
 #' @author Yixing Estella Dong
 #'
 #' @examples
-#' \dontrun{
-#' A relatively small data set is the Xenium mouse brain data that can be downloaded from 10X website.
+#' # A relatively small data set is the Xenium mouse brain data that can be 
+#' # downloaded from 10X website.
 #' 
-#' A mock .h5 and mock metadata with spatial location generated for a 4 genes by 
-#' 6 cells object is in /extdata: 
+#' # A mock .h5 and mock metadata with spatial location generated for a 4 genes by 
+#' # 6 cells object is in /extdata: 
 #' 
 #' xepath <- system.file(
 #'   file.path("extdata", "Xenium_small"),
@@ -55,14 +55,17 @@
 #' # One of the following depending on your input (.h5 or folder) and output 
 #' # (`SPE` or `SCE`) requirement.
 #' xe_spe <- readXeniumSXE(dirname = xepath)
-#' xe_spe <- readXeniumSXE(dirname = xepath, countfname = "cell_feature_matrix")
+#' \dontrun{
+#' xe_spe <- readXeniumSXE(dirname = xepath, countmatfpattern = "cell_feature_matrix")
+#' }
 #' xe_sce <- readXeniumSXE(dirname = xepath, return_type = "SCE")
 #' 
 #' # Subset to no control genes, and the same needed for `xe_sce` if read in as 
 #' # `SCE`.
+#' \dontrun{
 #' xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-#'
 #' }
+#'
 #' @importFrom DropletUtils read10xCounts
 #' @importFrom SpatialExperiment SpatialExperiment
 #' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
@@ -137,11 +140,6 @@ readXeniumSXE <- function(dirname,
       spatialCoordsNames = coord_names
     )
   }else if(return_type == "SCE"){
-    # # construct 'SingleCellExperiment'
-    # rownames(metadata) <- colnames(sce)
-    # colData(sce) <- as(metadata, "DFrame")
-    # sxe <- sce
-    # 
     # construct 'SingleCellExperiment'
     sxe <- SingleCellExperiment::SingleCellExperiment(
       assays = list(counts = as(counts(sce), "dgCMatrix")),
@@ -149,8 +147,6 @@ readXeniumSXE <- function(dirname,
       colData = metadata
     )
   }
-  
-  # if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }

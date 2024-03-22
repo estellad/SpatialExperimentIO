@@ -52,11 +52,11 @@ Xenium_unzipped \cr
 · | — cells.csv.gz \cr
 }
 \examples{
-\dontrun{
-A relatively small data set is the Xenium mouse brain data that can be downloaded from 10X website.
+# A relatively small data set is the Xenium mouse brain data that can be 
+# downloaded from 10X website.
 
-A mock .h5 and mock metadata with spatial location generated for a 4 genes by 
-6 cells object is in /extdata: 
+# A mock .h5 and mock metadata with spatial location generated for a 4 genes by 
+# 6 cells object is in /extdata: 
 
 xepath <- system.file(
   file.path("extdata", "Xenium_small"),
@@ -67,14 +67,17 @@ list.files(xepath)
 # One of the following depending on your input (.h5 or folder) and output 
 # (`SPE` or `SCE`) requirement.
 xe_spe <- readXeniumSXE(dirname = xepath)
-xe_spe <- readXeniumSXE(dirname = xepath, countfname = "cell_feature_matrix")
+\dontrun{
+xe_spe <- readXeniumSXE(dirname = xepath, countmatfpattern = "cell_feature_matrix")
+}
 xe_sce <- readXeniumSXE(dirname = xepath, return_type = "SCE")
 
 # Subset to no control genes, and the same needed for `xe_sce` if read in as 
 # `SCE`.
+\dontrun{
 xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
-
 }
+
 }
 \author{
 Yixing Estella Dong

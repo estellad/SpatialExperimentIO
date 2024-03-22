@@ -43,12 +43,13 @@ STARmap_PLUS_download/ \cr
 · | — *spatial.csv \cr
 }
 \examples{
+# A relatively small data download can be from:
 \dontrun{
-A relatively small data download can be from:
 https://zenodo.org/records/8327576
+}
 
-A mock counts and mock metadata with spatial location generated for a 8 genes by 
-9 cells object is in /extdata: 
+# A mock counts and mock metadata with spatial location generated for a 8 genes by 
+# 9 cells object is in /extdata: 
 
 starpath <- system.file(
   file.path("extdata", "STARmapPLUS_small"),
@@ -60,7 +61,6 @@ list.files(starpath)
 star_spe <- readStarmapplusSXE(dirname = starpath)
 star_sce <- readStarmapplusSXE(dirname = starpath, return_type = "SCE")
 
-}
 
 }
 \author{
