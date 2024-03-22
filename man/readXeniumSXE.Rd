@@ -7,8 +7,8 @@
 readXeniumSXE(
   dirname,
   return_type = "SPE",
-  countfname = "cell_feature_matrix.h5",
-  coordfpattern = "cells.csv.gz",
+  countmatfpattern = "cell_feature_matrix.h5",
+  metadatafpattern = "cells.csv.gz",
   coord_names = c("x_centroid", "y_centroid")
 )
 }
@@ -19,13 +19,13 @@ files of interest.}
 \item{return_type}{option of \code{"SPE"} or \code{"SCE"}, stands for
 \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}}
 
-\item{countfname}{a folder directory or the h5 file for the count matrix.
+\item{countmatfpattern}{a folder directory or the h5 file pattern for the count matrix.
 Default value is \code{"cell_feature_matrix.h5"}, alternative value is
 \code{"cell_feature_matrix"} that takes a bit longer. The count matrix is
 read in and stored in a \code{SingleCellExperiment} object, using
 \code{DropletUtils::read10xCounts()}}
 
-\item{coordfpattern}{a filename pattern of the zipped .csv file that
+\item{metadatafpattern}{a filename pattern of the zipped .csv file that
 contains spatial coords. Default value is \code{"cells.csv.gz"}, and there is no
 need to change.}
 
@@ -53,12 +53,13 @@ Xenium_unzipped \cr
 }
 \examples{
 \dontrun{
-# Data download is from: 
-# https://cf.10xgenomics.com/samples/xenium/1.0.2/Xenium_V1_FF_Mouse_Brain_
-# Coronal_Subset_CTX_HP/Xenium_V1_FF_Mouse_Brain_Coronal_Subset_CTX_HP_outs.zip
+A relatively small data set is the Xenium mouse brain data that can be downloaded from 10X website.
+
+A mock .h5 and mock metadata with spatial location generated for a 4 genes by 
+6 cells object is in /extdata: 
 
 xepath <- system.file(
-  file.path("extdata", "10xXenium"),
+  file.path("extdata", "Xenium_small"),
   package = "SpatialExperimentIO")
   
 list.files(xepath)
@@ -76,5 +77,5 @@ xe_spe <- xe_spe[rowData(xe_spe)$Type == "Gene Expression"]
 }
 }
 \author{
-Estella Yixing Dong
+Yixing Estella Dong
 }

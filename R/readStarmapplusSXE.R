@@ -3,56 +3,44 @@
 #' @title Load data from a STARmap PLUS experiment
 #' 
 #' @description
-#' Creates a \code{\link{SpatialExperiment}} from the downloaded unzipped CosMx  
-#' directory for Nanostring CosMx spatial gene expression data.
+#' Creates a \code{\link{SpatialExperiment}} from the downloaded STARmap PLUS count
+#' matrix.csv and metadata.csv
 #'
-#' @param dirname a directory path to CosMx download that contains files of interest.
+#' @param dirname a directory path to STARmap PLUS download that contains files of interest.
 #' @param return_type option of \code{"SPE"} or \code{"SCE"}, stands for 
 #' \code{SpatialExperiment} or \code{SingleCellExperiment} object. Default value \code{"SPE"}
 #' @param countmatfpattern a filename pattern for the count matrix. Default value is 
-#' \code{"exprMat_file.csv"}, and there is no need to change.
+#' \code{"raw_expression_pd.csv"}, and there is no need to change.
 #' @param metadatafpattern a filename pattern for the metadata .csv file that 
-#' contains spatial coords. Default value is \code{"metadata_file.csv"}, and 
+#' contains spatial coords. Default value is \code{"spatial.csv"}, and 
 #' there is no need to change.
-#' @param coord_names a vector of two strings specify the spatial coord names. 
-#' Default value is \code{c("CenterX_global_px", "CenterY_global_px")}, and 
-#' there is no need to change.
+#' @param coord_names a vector of three strings specify the spatial coord names. 
+#' Default value is \code{c("X", "Y", "Z")}, and there is no need to change.
 #' 
 #' @details
-#' The constructor assumes the downloaded unzipped CosMx folder has the following
+#' The constructor assumes the downloaded unzipped STARmap PLUS folder has the following
 #' structure, with two mandatory files:
-#' CosMx_unzipped/optional_default_folder/ \cr
-#' · | — *_exprMat_file.csv \cr
-#' · | — *_metadata_file.csv \cr
+#' STARmap_PLUS_download/ \cr
+#' · | — *raw_expression_pd.csv \cr
+#' · | — *spatial.csv \cr
 #' 
 #'
 #' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
 #' 
-#' @author Estella Yixing Dong
+#' @author Yixing Estella Dong
 #'
 #' @examples
 #' \dontrun{
-#' # Data download is from: 
-#' # https://zenodo.org/records/8327576
+#' A relatively small data download can be from:
+#' https://zenodo.org/records/8327576
 #' 
-#' TODO: not this ~ ---------------------------------
+#' A mock counts and mock metadata with spatial location generated for a 8 genes by 
+#' 9 cells object is in /extdata: 
+#' 
 #' starpath <- system.file(
-#'   file.path("extdata", "STARmap_PLUS"),
+#'   file.path("extdata", "STARmapPLUS_small"),
 #'   package = "SpatialExperimentIO")
-#' --------------------------------------------------
-#'   
-#' TODO: But something like this! -------------------
-#' starpath <- "path/to/a/defined/folder/"
-#' 
-#' eh <- ExperimentHub()
-#' query(eh, c("scSpatialExperimentData", "STARmap_PLUS"))
-#' 
-#' count.dat <- eh[["EH7543"]]
-#' write.csv(count.dat, file.path(starpath, "raw_expression_pd.csv")
-#' col.dat <- eh[["EH7544"]]
-#' write.csv(col.dat, file.path(starpath, "spatial.csv")
-#' --------------------------------------------------
 #' 
 #' list.files(starpath)
 #' 
@@ -63,7 +51,9 @@
 #' }
 #' 
 #' @importFrom SpatialExperiment SpatialExperiment
-#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
+#' @importFrom methods as
+#' @importFrom utils read.csv
 readStarmapplusSXE <- function(dirname = dirname, 
                                return_type = "SPE",
                                countmatfpattern = "raw_expression_pd.csv", 
@@ -74,46 +64,63 @@ readStarmapplusSXE <- function(dirname = dirname,
     stop("'return_type' must be one of c('SPE', 'SCE')")
   }
   
-  countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
+  ## Metadata sanity check 
+  if(!any(file.exists(file.path(dirname, list.files(dirname, metadatafpattern))))){
+    stop("STARmap PLUS metadata file does not exist in the directory. Expect 'spatial.csv' in `dirname`")
+  }
+  
   metadata_file <- file.path(dirname, list.files(dirname, metadatafpattern))
+  if(length(metadata_file) > 1){
+    stop("More than one metadata file possible with the provided pattern `metadatafpattern`")
+  }
+  
+  ## Count matrix sanity check
+  if(!any(file.exists(file.path(dirname, list.files(dirname, countmatfpattern))))){
+    stop("STARmap PLUS count matrix does not exist in the directory. Expect 'raw_expression_pd.csv' in `dirname`")
+  }
+  
+  countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
+  if(length(countmat_file) > 1){
+    stop("More than one count matrix file possible with the provided pattern `countmatfpattern`")
+  }
   
   # Read in 
   countmat <- read.csv(countmat_file)
   metadata <- read.csv(metadata_file)
   
   # Count matrix
-  rownames(stmpp_counts) <- stmpp_counts$GENE
-  stmpp_counts <- subset(stmpp_counts, select = -GENE)  
+  rownames(countmat) <- countmat$GENE
+  countmat <- subset(countmat, select = -GENE)  
+  countmat <- as.matrix(countmat)
 
   # rowData (does not exist)
   
-  # colData
-  rownames(stmpp_coord) <- stmpp_coord$NAME
-  stmpp_coord <- stmpp_coord[rownames(stmpp_coord) != "TYPE", ]
-  stmpp_coord$X <- as.numeric(stmpp_coord$X)
-  stmpp_coord$Y <- as.numeric(stmpp_coord$Y)
-  stmpp_coord$Z <- as.numeric(stmpp_coord$Z)
-  stmpp_coord$Main_molecular_cell_type <- as.factor(stmpp_coord$Main_molecular_cell_type)
-  stmpp_coord$Sub_molecular_cell_type <- as.factor(stmpp_coord$Sub_molecular_cell_type)
-  stmpp_coord$Main_molecular_tissue_region <- as.factor(stmpp_coord$Main_molecular_tissue_region)
-  stmpp_coord$Sub_molecular_tissue_region <- as.factor(stmpp_coord$Sub_molecular_tissue_region)
-  stmpp_coord$Molecular_spatial_cell_type <- as.factor(stmpp_coord$Molecular_spatial_cell_type)
+  # metadata
+  rownames(metadata) <- metadata$NAME
+  metadata <- metadata[rownames(metadata) != "TYPE", ]
+  metadata$X <- as.numeric(metadata$X)
+  metadata$Y <- as.numeric(metadata$Y)
+  metadata$Z <- as.numeric(metadata$Z)
+  
+  if(!all(coord_names %in% colnames(metadata))){
+    stop("`coord_names` not in columns of `metadatafpattern`. For STARmap PLUS, expect c('X', 'Y', 'Z') in the columns of the metadata 'spatial.csv'. " )
+  }
   
   if(return_type == "SPE"){
     sxe <- SpatialExperiment::SpatialExperiment(
-      assays = list(counts = stmpp_counts),
+      assays = list(counts = countmat),
       # rowData = rowData,
-      colData = stmpp_coord,
+      colData = metadata,
       spatialCoordsNames = coord_names)
   }else if(return_type == "SCE"){
     # construct 'SingleCellExperiment'
     sxe <- SingleCellExperiment::SingleCellExperiment(
-      assays = list(counts = stmpp_counts),
-      colData = stmpp_coord
+      assays = list(counts = countmat),
+      colData = metadata
     )
   }
   
-  if(class(counts(sxe)) != "dgCMatrix"){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
+  if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
 }
