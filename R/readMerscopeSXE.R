@@ -27,21 +27,20 @@
 #' @return  a \code{\link{SpatialExperiment}} or a \code{\link{SingleCellExperiment}} object 
 #' @export
 #' 
-#' @author Estella Yixing Dong
+#' @author Yixing Estella Dong
 #'
 #' @examples
 #' \dontrun{
-#' # Data download is from: 
+#' # A relatively small data download can be from:
 #' https://console.cloud.google.com/storage/browser/vz-ffpe-showcase/
 #' HumanOvarianCancerPatient2Slice2?pageState=(%22StorageObjectListTable%22:
 #' (%22f%22:%22%255B%255D%22))&prefix=&forceOnObjectsSortingFiltering=false
 #' 
-#' # Here as an example, we have downsized the count matrix and meta data file to 
-#' # only around 450 randomly selected cells and 20 genes, and necessary columns 
-#' # of the metadata. 
+#' A mock counts and mock metadata with spatial location generated for a 9 genes by 
+#' 8 cells object is in /extdata: 
 #' 
 #' merpath <- system.file(
-#'   file.path("extdata", "VizgenMERSCOPE"),
+#'   file.path("extdata", "MERSCOPE_small"),
 #'   package = "SpatialExperimentIO")
 #'   
 #' list.files(merpath)
@@ -53,7 +52,9 @@
 #' }
 #' 
 #' @importFrom SpatialExperiment SpatialExperiment
-#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SingleCellExperiment SingleCellExperiment rowData counts colData
+#' @importFrom methods as
+#' @importFrom utils read.csv
 readMerscopeSXE <- function(dirname = dirname, 
                             return_type = "SPE",
                             countmatfpattern = "cell_by_gene.csv", 
@@ -64,8 +65,25 @@ readMerscopeSXE <- function(dirname = dirname,
     stop("'return_type' must be one of c('SPE', 'SCE')")
   }
   
-  countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
+  ## Metadata sanity check 
+  if(!any(file.exists(file.path(dirname, list.files(dirname, metadatafpattern))))){
+    stop("MERSCOPE metadata file does not exist in the directory. Expect 'cell_metadata.csv' in `dirname`")
+  }
+  
   metadata_file <- file.path(dirname, list.files(dirname, metadatafpattern))
+  if(length(metadata_file) > 1){
+    stop("More than one metadata file possible with the provided pattern `metadatafpattern`")
+  }
+  
+  ## Count matrix sanity check
+  if(!any(file.exists(file.path(dirname, list.files(dirname, countmatfpattern))))){
+    stop("MERSCOPE count matrix does not exist in the directory. Expect 'cell_by_gene.csv' in `dirname`")
+  }
+  
+  countmat_file <- file.path(dirname, list.files(dirname, countmatfpattern))
+  if(length(countmat_file) > 1){
+    stop("More than one count matrix file possible with the provided pattern `countmatfpattern`")
+  }
   
   # Read in 
   countmat <- read.csv(countmat_file)
@@ -81,26 +99,30 @@ readMerscopeSXE <- function(dirname = dirname,
   
   # rowData (does not exist)
   
-  # colData
+  # metadata
   rownames(metadata) <- metadata$cell + 1
-  colData <- subset(metadata, select = -cell)
+  metadata <- subset(metadata, select = -cell)
+  
+  if(!all(coord_names %in% colnames(metadata))){
+    stop("`coord_names` not in columns of `metadatafpattern`. For MERSCOPE, expect c('center_x', 'center_y') in the columns of the metadata 'cell_metadata.csv'. " )
+  }
   
   if(return_type == "SPE"){
     # construct 'SpatialExperiment'
     sxe <- SpatialExperiment::SpatialExperiment(
       assays = list(counts = counts),
       # rowData = rowData,
-      colData = colData,
+      colData = metadata,
       spatialCoordsNames = coord_names)
     }else if(return_type == "SCE"){
       # construct 'SingleCellExperiment'
       sxe <- SingleCellExperiment::SingleCellExperiment(
         assays = list(counts = counts),
-        colData = colData
+        colData = metadata
       )
     }
   
-  if(class(counts(sxe)) != "dgCMatrix"){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
+  if(any(class(counts(sxe)) != "dgCMatrix")){counts(sxe) <- as(counts(sxe), "dgCMatrix")}
   
   return(sxe)
   
