@@ -4,6 +4,7 @@
 .Rbuildignore
 .DS_Store
 tests/test_realdata_secretely.R
+*.Rproj
 
 # Session Data files
 .RData
