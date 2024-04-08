@@ -4,6 +4,7 @@
 .Rbuildignore
 .DS_Store
 tests/test_realdata_secretely.R
+*.Rproj
 
 # Session Data files
 .RData
@@ -51,3 +52,4 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 .Rproj.user
+/inst/.DS_Store
