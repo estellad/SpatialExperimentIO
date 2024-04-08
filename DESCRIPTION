@@ -1,6 +1,6 @@
 Package: SpatialExperimentIO
 Title: Read in Xenium, CosMx, MERSCOPE or STARmapPLUS data as SpatialExperiment object
-Version: 0.99.1
+Version: 0.99.2
 Authors@R: c(
     person("Yixing E.", "Dong", 
         email = "estelladong729@gmail.com", 
