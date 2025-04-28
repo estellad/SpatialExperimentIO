@@ -6,7 +6,7 @@
 \usage{
 readStarmapplusSXE(
   dirName = dirName,
-  returnType = "SPE",
+  returnType = c("SPE", "SCE"),
   countMatPattern = "raw_expression_pd.csv",
   metaDataPattern = "spatial.csv",
   coordNames = c("X", "Y", "Z")

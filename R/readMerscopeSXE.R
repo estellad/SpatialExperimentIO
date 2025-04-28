@@ -55,12 +55,12 @@
 #' @importFrom methods as
 #' @importFrom utils read.csv
 readMerscopeSXE <- function(dirName = dirName, 
-                            returnType = "SPE",
+                            returnType = c("SPE", "SCE"),
                             countMatPattern = "cell_by_gene.csv", 
                             metaDataPattern = "cell_metadata.csv", 
                             coordNames = c("center_x", "center_y")){
   
-  returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  returnType <- match.arg(returnType)
   tech <- "Merscope"
   
   # Sanity checks

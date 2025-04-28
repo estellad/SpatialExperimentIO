@@ -54,12 +54,13 @@
 #' @importFrom methods as
 #' @importFrom utils read.csv
 readSeqfishSXE <- function(dirName = dirName, 
-                           returnType = "SPE",
+                           returnType = c("SPE", "SCE"),
                            countMatPattern = "CellxGene.csv", 
                            metaDataPattern = "CellCoordinates.csv", 
                            coordNames = c("center_x", "center_y")){
   
-  returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  returnType <- match.arg(returnType)
+  
   tech <- "Seqfish"
   
   # Sanity checks

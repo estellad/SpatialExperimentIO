@@ -6,7 +6,7 @@
 \usage{
 readSeqfishSXE(
   dirName = dirName,
-  returnType = "SPE",
+  returnType = c("SPE", "SCE"),
   countMatPattern = "CellxGene.csv",
   metaDataPattern = "CellCoordinates.csv",
   coordNames = c("center_x", "center_y")

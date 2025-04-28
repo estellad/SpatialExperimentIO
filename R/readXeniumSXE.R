@@ -91,9 +91,9 @@
 #' @importFrom arrow read_parquet read_json_arrow
 #' 
 readXeniumSXE <- function(dirName, 
-                          returnType = "SPE",
-                          countMatPattern = "cell_feature_matrix.h5",
-                          metaDataPattern = "cells.parquet", # or cells.csv.gz 
+                          returnType = c("SPE", "SCE"),
+                          countMatPattern = c("cell_feature_matrix.h5", "cell_feature_matrix"),
+                          metaDataPattern = c("cells.parquet", "cells.csv.gz"), 
                           coordNames = c("x_centroid", "y_centroid"), 
                           addExperimentXenium = TRUE,
                           altExps = c("NegControlProbe", "UnassignedCodeword", 
@@ -101,7 +101,9 @@ readXeniumSXE <- function(dirName,
                           addParquetPaths = TRUE,
                           ...){
 
-  returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  returnType <- match.arg(returnType)
+  countMatPattern <- match.arg(countMatPattern)
+  metaDataPattern <- match.arg(metaDataPattern)
   tech <- "Xenium"
   
   # Sanity checks

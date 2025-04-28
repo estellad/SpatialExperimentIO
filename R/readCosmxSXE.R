@@ -81,7 +81,7 @@
 #' @importFrom arrow write_parquet
 #' 
 readCosmxSXE <- function(dirName = dirName, 
-                         returnType = "SPE",
+                         returnType = c("SPE", "SCE"),
                          countMatPattern = "exprMat_file.csv", 
                          metaDataPattern = "metadata_file.csv", 
                          coordNames = c("CenterX_global_px", "CenterY_global_px"),
@@ -91,7 +91,7 @@ readCosmxSXE <- function(dirName = dirName,
                          addParquetPaths = TRUE,
                          ...){
   
-  returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  returnType <- match.arg(returnType)
   tech <- "CosMx"
   
   # Sanity checks

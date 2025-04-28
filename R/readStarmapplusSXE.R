@@ -54,12 +54,13 @@
 #' @importFrom methods as
 #' @importFrom utils read.csv
 readStarmapplusSXE <- function(dirName = dirName, 
-                               returnType = "SPE",
+                               returnType = c("SPE", "SCE"),
                                countMatPattern = "raw_expression_pd.csv", 
                                metaDataPattern = "spatial.csv", 
                                coordNames = c("X", "Y", "Z")){
   
-  returnType <- match.arg(returnType, choices = c("SPE", "SCE"))
+  returnType <- match.arg(returnType)
+  
   tech <- "Starmapplus"
   
   # Sanity checks

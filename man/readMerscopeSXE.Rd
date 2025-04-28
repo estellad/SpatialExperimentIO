@@ -6,7 +6,7 @@
 \usage{
 readMerscopeSXE(
   dirName = dirName,
-  returnType = "SPE",
+  returnType = c("SPE", "SCE"),
   countMatPattern = "cell_by_gene.csv",
   metaDataPattern = "cell_metadata.csv",
   coordNames = c("center_x", "center_y")
