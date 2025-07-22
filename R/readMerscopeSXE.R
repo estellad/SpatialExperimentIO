@@ -72,7 +72,7 @@ readMerscopeSXE <- function(dirName = dirName,
   countmat <- countmat[order(countmat$cell), ]
   
   metadata <- read.csv(metadata_file)
-  names(metadata)[names(metadata) == "X"] <- "cell"
+  names(metadata)[names(metadata) %in% c("EntityID", "V1", "X")] <- "cell"
   metadata <- metadata[order(metadata$cell), ]
   
   # Count matrix 
