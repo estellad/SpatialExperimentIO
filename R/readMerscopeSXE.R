@@ -73,6 +73,7 @@ readMerscopeSXE <- function(dirName = dirName,
   
   metadata <- data.table::fread(metadata_file)
   names(metadata)[names(metadata) %in% c("EntityID", "V1", "X")] <- "cell"
+  metadata$cell <- as.character(metadata$cell)
   metadata <- metadata[order(metadata$cell), ]
   
   # Count matrix 
